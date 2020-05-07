@@ -115,18 +115,20 @@ function processUser(id) {
   });
 }
 
-function startRecursive() {
-  // Fetch 10 users from the array
-  // Call processUser(users[i].id)
-  // Process those 10 users in parallel
-  // Wait for those 10 to finish processing
-  // Then sum the result of the promise
-  // Then recursivly run the next 10 users...
-  // Until the `users` array is empty
-  // Then finally spit out total collect sum .
-  // Your response should be "Total: 4950"
+async function startRecursive(length) {
+  const tenUsers = users.slice(length - 10, length);
+
+  if (!tenUsers.length) return 0;
+
+  const usersPromisesArray = tenUsers.map((user) => processUser(user.id));
+
+  const getTenUsers = await Promise.all(usersPromisesArray);
+
+  const usersIdSum = getTenUsers.reduce((acc, id) => acc + id, 0);
+
+  return startRecursive(length - 10).then((sum) => sum + usersIdSum);
 }
 
-startRecursive().then((total) => {
-  console.log("Total: ", total);
+startRecursive(users.length).then((total) => {
+  console.log("Total:", total);
 });
